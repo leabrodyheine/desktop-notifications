@@ -23,7 +23,12 @@ final class ReminderPanelController {
         let pet = PetKind.allCases[petRotation % PetKind.allCases.count]
         petRotation += 1
 
-        let state = ReminderPresentationState(reminders: reminders, pet: pet)
+        let travelsLeftToRight = Bool.random()
+        let state = ReminderPresentationState(
+            reminders: reminders,
+            pet: pet,
+            facingLeft: !travelsLeftToRight
+        )
         presentationState = state
 
         let panel = makePanel()
@@ -39,7 +44,6 @@ final class ReminderPanelController {
             )
         )
 
-        let travelsLeftToRight = Bool.random()
         let visibleFrame = screen.visibleFrame
         let startX = travelsLeftToRight
             ? visibleFrame.minX - panelSize.width
@@ -122,10 +126,12 @@ final class ReminderPanelController {
 final class ReminderPresentationState: ObservableObject {
     let reminders: [ReminderCandidate]
     let pet: PetKind
+    let facingLeft: Bool
     @Published var isCallingAttention = false
 
-    init(reminders: [ReminderCandidate], pet: PetKind = .calicoCat) {
+    init(reminders: [ReminderCandidate], pet: PetKind = .greyCat, facingLeft: Bool = false) {
         self.reminders = reminders
         self.pet = pet
+        self.facingLeft = facingLeft
     }
 }

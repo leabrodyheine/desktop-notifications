@@ -6,7 +6,6 @@ struct ReminderView: View {
     let onOpen: () -> Void
 
     @State private var isHovering = false
-    @State private var isWalking = false
 
     private var firstReminder: ReminderCandidate? {
         state.reminders.first
@@ -14,23 +13,15 @@ struct ReminderView: View {
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 14) {
-            pet
+            PetIllustration(
+                kind: state.pet,
+                isCallingAttention: state.isCallingAttention,
+                facingLeft: state.facingLeft
+            )
             reminderBubble
         }
         .padding(18)
         .frame(width: 460, height: 190, alignment: .bottom)
-        .onAppear { isWalking = true }
-    }
-
-    private var pet: some View {
-        PetIllustration(kind: state.pet, isCallingAttention: state.isCallingAttention)
-            .rotationEffect(.degrees(isWalking ? 2.5 : -2.5), anchor: .bottom)
-            .offset(y: isWalking ? -2 : 2)
-            .animation(
-                .easeInOut(duration: 0.3).repeatForever(autoreverses: true),
-                value: isWalking
-            )
-            .accessibilityLabel("Desktop pet")
     }
 
     private var reminderBubble: some View {

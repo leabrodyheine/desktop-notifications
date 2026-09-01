@@ -17,6 +17,10 @@
 		A10000000000000000000009 /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* MenuBarContentView.swift */; };
 		A1000000000000000000000A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000A /* SettingsView.swift */; };
 		A1000000000000000000000D /* PetIllustration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000D /* PetIllustration.swift */; };
+		A1000000000000000000000E /* grey-cat.png in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000E /* grey-cat.png */; };
+		A1000000000000000000000F /* orange-cat.png in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000F /* orange-cat.png */; };
+		A10000000000000000000010 /* black-cat.png in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* black-cat.png */; };
+		A10000000000000000000011 /* hamster.png in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* hamster.png */; };
 		A1000000000000000000000B /* ReminderSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000B /* ReminderSchedulerTests.swift */; };
 		A1000000000000000000000C /* DesktopPet.app in Frameworks */ = {isa = PBXBuildFile; fileRef = A30000000000000000000001 /* DesktopPet.app */; };
 /* End PBXBuildFile section */
@@ -43,6 +47,10 @@
 		A20000000000000000000009 /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
 		A2000000000000000000000A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A2000000000000000000000D /* PetIllustration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetIllustration.swift; sourceTree = "<group>"; };
+		A2000000000000000000000E /* grey-cat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "grey-cat.png"; sourceTree = "<group>"; };
+		A2000000000000000000000F /* orange-cat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "orange-cat.png"; sourceTree = "<group>"; };
+		A20000000000000000000010 /* black-cat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "black-cat.png"; sourceTree = "<group>"; };
+		A20000000000000000000011 /* hamster.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "hamster.png"; sourceTree = "<group>"; };
 		A2000000000000000000000B /* ReminderSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSchedulerTests.swift; sourceTree = "<group>"; };
 		A30000000000000000000001 /* DesktopPet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DesktopPet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A30000000000000000000002 /* DesktopPetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DesktopPetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -61,10 +69,11 @@
 		};
 		A80000000000000000000002 /* DesktopPet */ = {
 			isa = PBXGroup;
-			children = (A20000000000000000000001, A20000000000000000000002, A80000000000000000000003 /* Models */, A80000000000000000000004 /* Calendar */, A80000000000000000000005 /* Reminders */, A80000000000000000000006 /* Presentation */, A80000000000000000000009 /* Views */);
+			children = (A20000000000000000000001, A20000000000000000000002, A80000000000000000000003 /* Models */, A80000000000000000000004 /* Calendar */, A80000000000000000000005 /* Reminders */, A80000000000000000000006 /* Presentation */, A80000000000000000000009 /* Views */, A8000000000000000000000A /* Pets */);
 			path = DesktopPet;
 			sourceTree = "<group>";
 		};
+		A8000000000000000000000A /* Pets */ = {isa = PBXGroup; children = (A2000000000000000000000E, A2000000000000000000000F, A20000000000000000000010, A20000000000000000000011); path = Pets; sourceTree = "<group>"; };
 		A80000000000000000000003 /* Models */ = {isa = PBXGroup; children = (A20000000000000000000003, A20000000000000000000004); path = Models; sourceTree = "<group>"; };
 		A80000000000000000000004 /* Calendar */ = {isa = PBXGroup; children = (A20000000000000000000005); path = Calendar; sourceTree = "<group>"; };
 		A80000000000000000000005 /* Reminders */ = {isa = PBXGroup; children = (A20000000000000000000006); path = Reminders; sourceTree = "<group>"; };
@@ -117,7 +126,7 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		AB0000000000000000000001 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		AB0000000000000000000001 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A1000000000000000000000E /* grey-cat.png in Resources */, A1000000000000000000000F /* orange-cat.png in Resources */, A10000000000000000000010 /* black-cat.png in Resources */, A10000000000000000000011 /* hamster.png in Resources */); runOnlyForDeploymentPostprocessing = 0; };
 		AB0000000000000000000002 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
