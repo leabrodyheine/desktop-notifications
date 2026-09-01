@@ -14,7 +14,7 @@ struct ReminderView: View {
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 14) {
-            placeholderPet
+            pet
             reminderBubble
         }
         .padding(18)
@@ -22,37 +22,15 @@ struct ReminderView: View {
         .onAppear { isWalking = true }
     }
 
-    private var placeholderPet: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [.indigo, .purple],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 104, height: 112)
-
-            Image(systemName: state.isCallingAttention ? "bell.fill" : "pawprint.fill")
-                .font(.system(size: 43, weight: .semibold))
-                .foregroundStyle(.white)
-                .symbolEffect(.bounce, value: state.isCallingAttention)
-        }
-        .overlay(alignment: .bottom) {
-            HStack(spacing: 34) {
-                Capsule().fill(.indigo).frame(width: 18, height: 29)
-                Capsule().fill(.indigo).frame(width: 18, height: 29)
-            }
-            .offset(y: 17)
-        }
-        .rotationEffect(.degrees(isWalking ? 2 : -2))
-        .offset(y: isWalking ? -3 : 3)
-        .animation(
-            .easeInOut(duration: 0.28).repeatForever(autoreverses: true),
-            value: isWalking
-        )
-        .accessibilityLabel("Desktop pet placeholder")
+    private var pet: some View {
+        PetIllustration(kind: state.pet, isCallingAttention: state.isCallingAttention)
+            .rotationEffect(.degrees(isWalking ? 2.5 : -2.5), anchor: .bottom)
+            .offset(y: isWalking ? -2 : 2)
+            .animation(
+                .easeInOut(duration: 0.3).repeatForever(autoreverses: true),
+                value: isWalking
+            )
+            .accessibilityLabel("Desktop pet")
     }
 
     private var reminderBubble: some View {

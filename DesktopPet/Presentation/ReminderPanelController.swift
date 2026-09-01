@@ -7,6 +7,7 @@ final class ReminderPanelController {
     private var panel: NSPanel?
     private var presentationState: ReminderPresentationState?
     private var presentationID = UUID()
+    private var petRotation = Int.random(in: 0..<PetKind.allCases.count)
 
     func present(
         reminders: [ReminderCandidate],
@@ -19,7 +20,10 @@ final class ReminderPanelController {
         let currentID = UUID()
         presentationID = currentID
 
-        let state = ReminderPresentationState(reminders: reminders)
+        let pet = PetKind.allCases[petRotation % PetKind.allCases.count]
+        petRotation += 1
+
+        let state = ReminderPresentationState(reminders: reminders, pet: pet)
         presentationState = state
 
         let panel = makePanel()
@@ -117,9 +121,11 @@ final class ReminderPanelController {
 @MainActor
 final class ReminderPresentationState: ObservableObject {
     let reminders: [ReminderCandidate]
+    let pet: PetKind
     @Published var isCallingAttention = false
 
-    init(reminders: [ReminderCandidate]) {
+    init(reminders: [ReminderCandidate], pet: PetKind = .calicoCat) {
         self.reminders = reminders
+        self.pet = pet
     }
 }
