@@ -4,7 +4,7 @@ A small native macOS desktop-pet app for personal calendar reminders.
 
 ## Status
 
-This repository is currently in the product-design stage. The brief below defines the proposed first version; implementation has not started.
+The first-version brief is approved and implementation is underway. See `IMPLEMENTATION_PLAN.md` for the staged build plan.
 
 ## App description
 
@@ -152,6 +152,20 @@ Keep reminder scheduling, calendar access, and pet presentation as three straigh
 - [ ] No sound, AI, accounts, telemetry, or server components are present.
 - [ ] Placeholder artwork can later be replaced without altering calendar logic.
 
-## Approval gates
+## Development
 
-Do not begin implementation until the brief is explicitly approved. After approval, prepare a small step-by-step implementation plan before writing code.
+Open `DesktopPet.xcodeproj` in Xcode and select the `DesktopPet` scheme. The project targets macOS 14 or later.
+
+From the command line, build and test with the full Xcode toolchain:
+
+```sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
+  xcodebuild -project DesktopPet.xcodeproj -scheme DesktopPet \
+  -destination 'platform=macOS' build
+
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
+  xcodebuild -project DesktopPet.xcodeproj -scheme DesktopPet \
+  -destination 'platform=macOS' test
+```
+
+Calendar access is requested only after choosing **Connect Apple Calendar**. Use **Preview reminder** to exercise the overlay without calendar access or a scheduled event.
