@@ -8,16 +8,16 @@ import SwiftUI
 enum PetKind: String, CaseIterable, Sendable {
     case greyCat
     case orangeCat
-    case blackCat
-    case hamster
+    case whiteCat
+    case panda
 
     /// Resource name of the sprite sheet in the bundle.
     var assetName: String {
         switch self {
         case .greyCat: return "grey-cat"
         case .orangeCat: return "orange-cat"
-        case .blackCat: return "black-cat"
-        case .hamster: return "hamster"
+        case .whiteCat: return "white-cat"
+        case .panda: return "panda"
         }
     }
 }
@@ -82,7 +82,7 @@ struct PetIllustration: View {
             }
             .scaleEffect(x: facingLeft ? -1 : 1, y: 1)
         }
-        .frame(width: 132, height: 104)
+        .frame(width: 100, height: 72)
         .offset(y: isCallingAttention ? -4 : 0)
         .animation(.spring(response: 0.34, dampingFraction: 0.55), value: isCallingAttention)
         .accessibilityLabel("Pixel pet")
