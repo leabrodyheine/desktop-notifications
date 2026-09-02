@@ -8,28 +8,20 @@ import SwiftUI
 enum PetKind: String, CaseIterable, Sendable {
     case frog
     case chick
-    case penguin
-    case redPanda
-    case duck
-    case catDonut
 
     /// Resource name of the GIF in the bundle.
     var assetName: String {
         switch self {
         case .frog: return "frog"
         case .chick: return "chick"
-        case .penguin: return "penguin"
-        case .redPanda: return "redpanda"
-        case .duck: return "duck"
-        case .catDonut: return "catdonut"
         }
     }
 
     /// Direction the artwork faces before any flip.
     var artFacesLeft: Bool {
         switch self {
-        case .chick, .penguin: return true
-        case .frog, .redPanda, .duck, .catDonut: return false
+        case .chick: return true
+        case .frog: return false
         }
     }
 
@@ -153,9 +145,8 @@ struct PetIllustration: View {
 
 #Preview {
     HStack(spacing: 8) {
-        PetIllustration(kind: .redPanda)
-        PetIllustration(kind: .penguin, facingLeft: true)
-        PetIllustration(kind: .catDonut)
+        PetIllustration(kind: .frog)
+        PetIllustration(kind: .chick, facingLeft: true)
     }
     .padding()
     .background(Color(white: 0.15))
