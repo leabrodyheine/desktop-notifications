@@ -18,7 +18,7 @@ enum PetKind: String, CaseIterable, Sendable {
     /// Number of frames packed left-to-right in the sheet.
     var frameCount: Int {
         switch self {
-        case .bernese: return 8
+        case .bernese: return 10
         }
     }
 
