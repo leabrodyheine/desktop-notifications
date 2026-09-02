@@ -129,7 +129,7 @@ final class ReminderPresentationState: ObservableObject {
     let facingLeft: Bool
     @Published var isCallingAttention = false
 
-    init(reminders: [ReminderCandidate], pet: PetKind = .greyCat, facingLeft: Bool = false) {
+    init(reminders: [ReminderCandidate], pet: PetKind = .bernese, facingLeft: Bool = false) {
         self.reminders = reminders
         self.pet = pet
         self.facingLeft = facingLeft

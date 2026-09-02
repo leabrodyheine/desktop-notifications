@@ -2,48 +2,55 @@ import CoreGraphics
 import ImageIO
 import SwiftUI
 
-/// The pixel-art pets that reminders rotate through. Each ships as a 4-frame
-/// horizontal sprite sheet in the app bundle; the sheet is sliced once and the
-/// frames are cycled to animate a walk.
+/// The pets that reminders rotate through. Each ships as a horizontal
+/// sprite sheet in the app bundle; the sheet is sliced once and the frames
+/// are cycled to animate a walk.
 enum PetKind: String, CaseIterable, Sendable {
-    case greyCat
-    case orangeCat
-    case whiteCat
-    case panda
+    case bernese
 
     /// Resource name of the sprite sheet in the bundle.
     var assetName: String {
         switch self {
-        case .greyCat: return "grey-cat"
-        case .orangeCat: return "orange-cat"
-        case .whiteCat: return "white-cat"
-        case .panda: return "panda"
+        case .bernese: return "bernese"
+        }
+    }
+
+    /// Number of frames packed left-to-right in the sheet.
+    var frameCount: Int {
+        switch self {
+        case .bernese: return 8
+        }
+    }
+
+    /// Direction the artwork faces before any flip.
+    var artFacesLeft: Bool {
+        switch self {
+        case .bernese: return true
         }
     }
 }
 
 /// Loads and caches the sliced frames for each pet's sprite sheet.
 private enum SpriteCache {
-    static let frameCount = 4
     private static var cache: [PetKind: [CGImage]] = [:]
 
     static func frames(for kind: PetKind) -> [CGImage] {
         if let cached = cache[kind] { return cached }
-        let sliced = load(kind.assetName)
+        let sliced = load(kind.assetName, count: kind.frameCount)
         cache[kind] = sliced
         return sliced
     }
 
-    private static func load(_ name: String) -> [CGImage] {
+    private static func load(_ name: String, count: Int) -> [CGImage] {
         guard
             let url = Bundle.main.url(forResource: name, withExtension: "png"),
             let source = CGImageSourceCreateWithURL(url as CFURL, nil),
             let sheet = CGImageSourceCreateImageAtIndex(source, 0, nil)
         else { return [] }
 
-        let frameWidth = sheet.width / frameCount
+        let frameWidth = sheet.width / count
         let frameHeight = sheet.height
-        return (0..<frameCount).compactMap { index in
+        return (0..<count).compactMap { index in
             sheet.cropping(to: CGRect(
                 x: index * frameWidth, y: 0, width: frameWidth, height: frameHeight
             ))
@@ -54,13 +61,15 @@ private enum SpriteCache {
 struct PetIllustration: View {
     var kind: PetKind
     var isCallingAttention: Bool = false
-    /// Sprites are drawn facing right; flip when the pet travels right-to-left.
+    /// True when the pet is travelling right-to-left across the screen.
     var facingLeft: Bool = false
 
-    private static let framesPerSecond = 7.0
+    private static let framesPerSecond = 10.0
 
     var body: some View {
         let frames = SpriteCache.frames(for: kind)
+        // Flip so the pet faces its direction of travel.
+        let flipped = facingLeft != kind.artFacesLeft
 
         TimelineView(.animation(minimumInterval: 1.0 / Self.framesPerSecond, paused: isCallingAttention)) { timeline in
             let index: Int = {
@@ -73,30 +82,26 @@ struct PetIllustration: View {
             Group {
                 if frames.indices.contains(index) {
                     Image(decorative: frames[index], scale: 1, orientation: .up)
-                        .interpolation(.none)
                         .resizable()
+                        .interpolation(.high)
                         .aspectRatio(contentMode: .fit)
                 } else {
                     Color.clear
                 }
             }
-            .scaleEffect(x: facingLeft ? -1 : 1, y: 1)
+            .scaleEffect(x: flipped ? -1 : 1, y: 1)
         }
-        .frame(width: 100, height: 72)
+        .frame(width: 104, height: 96)
         .offset(y: isCallingAttention ? -4 : 0)
         .animation(.spring(response: 0.34, dampingFraction: 0.55), value: isCallingAttention)
-        .accessibilityLabel("Pixel pet")
+        .accessibilityLabel("Pet")
     }
 }
 
 #Preview {
     HStack(spacing: 8) {
-        ForEach(PetKind.allCases, id: \.self) { kind in
-            VStack {
-                PetIllustration(kind: kind)
-                PetIllustration(kind: kind, facingLeft: true)
-            }
-        }
+        PetIllustration(kind: .bernese)
+        PetIllustration(kind: .bernese, facingLeft: true)
     }
     .padding()
     .background(Color(white: 0.15))
