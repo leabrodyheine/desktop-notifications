@@ -2,59 +2,114 @@ import CoreGraphics
 import ImageIO
 import SwiftUI
 
-/// The pets that reminders rotate through. Each ships as a horizontal
-/// sprite sheet in the app bundle; the sheet is sliced once and the frames
-/// are cycled to animate a walk.
+/// The pets that reminders rotate through. Each ships as an animated GIF in
+/// the app bundle; the frames are decoded once and cycled on the GIF's own
+/// timing to play its loop.
 enum PetKind: String, CaseIterable, Sendable {
-    case bernese
+    case frog
+    case chick
+    case penguin
+    case redPanda
+    case duck
+    case catDonut
 
-    /// Resource name of the sprite sheet in the bundle.
+    /// Resource name of the GIF in the bundle.
     var assetName: String {
         switch self {
-        case .bernese: return "bernese"
-        }
-    }
-
-    /// Number of frames packed left-to-right in the sheet.
-    var frameCount: Int {
-        switch self {
-        case .bernese: return 10
+        case .frog: return "frog"
+        case .chick: return "chick"
+        case .penguin: return "penguin"
+        case .redPanda: return "redpanda"
+        case .duck: return "duck"
+        case .catDonut: return "catdonut"
         }
     }
 
     /// Direction the artwork faces before any flip.
     var artFacesLeft: Bool {
         switch self {
-        case .bernese: return true
+        case .chick, .penguin: return true
+        case .frog, .redPanda, .duck, .catDonut: return false
+        }
+    }
+
+    /// Per-pet tweak to the on-screen size so tall or small artwork
+    /// doesn't read as tiny next to the wider walkers.
+    var sizeScale: CGFloat {
+        switch self {
+        case .chick: return 1.2
+        default: return 1
         }
     }
 }
 
-/// Loads and caches the sliced frames for each pet's sprite sheet.
-private enum SpriteCache {
-    private static var cache: [PetKind: [CGImage]] = [:]
+/// One decoded GIF: its frames plus the cumulative time each frame ends at.
+private struct PetAnimation {
+    var frames: [CGImage]
+    /// `frameEnd[i]` is the elapsed time (seconds) at which frame `i` finishes.
+    var frameEnd: [Double]
+    var totalDuration: Double
+    var minFrameDelay: Double
 
-    static func frames(for kind: PetKind) -> [CGImage] {
+    func frameIndex(atElapsed elapsed: Double) -> Int {
+        guard totalDuration > 0, !frames.isEmpty else { return 0 }
+        let t = elapsed.truncatingRemainder(dividingBy: totalDuration)
+        for (i, end) in frameEnd.enumerated() where t < end { return i }
+        return frames.count - 1
+    }
+}
+
+/// Decodes and caches the frames for each pet's GIF.
+private enum PetAnimationCache {
+    private static var cache: [PetKind: PetAnimation] = [:]
+
+    static func animation(for kind: PetKind) -> PetAnimation {
         if let cached = cache[kind] { return cached }
-        let sliced = load(kind.assetName, count: kind.frameCount)
-        cache[kind] = sliced
-        return sliced
+        let decoded = decode(kind.assetName)
+        cache[kind] = decoded
+        return decoded
     }
 
-    private static func load(_ name: String, count: Int) -> [CGImage] {
+    private static func decode(_ name: String) -> PetAnimation {
         guard
-            let url = Bundle.main.url(forResource: name, withExtension: "png"),
-            let source = CGImageSourceCreateWithURL(url as CFURL, nil),
-            let sheet = CGImageSourceCreateImageAtIndex(source, 0, nil)
-        else { return [] }
-
-        let frameWidth = sheet.width / count
-        let frameHeight = sheet.height
-        return (0..<count).compactMap { index in
-            sheet.cropping(to: CGRect(
-                x: index * frameWidth, y: 0, width: frameWidth, height: frameHeight
-            ))
+            let url = Bundle.main.url(forResource: name, withExtension: "gif"),
+            let source = CGImageSourceCreateWithURL(url as CFURL, nil)
+        else {
+            return PetAnimation(frames: [], frameEnd: [], totalDuration: 0, minFrameDelay: 0.1)
         }
+
+        let count = CGImageSourceGetCount(source)
+        var frames: [CGImage] = []
+        var frameEnd: [Double] = []
+        var elapsed = 0.0
+        var minDelay = Double.greatestFiniteMagnitude
+
+        for index in 0..<count {
+            guard let frame = CGImageSourceCreateImageAtIndex(source, index, nil) else { continue }
+            let delay = frameDelay(source, index)
+            frames.append(frame)
+            elapsed += delay
+            frameEnd.append(elapsed)
+            minDelay = min(minDelay, delay)
+        }
+
+        if !minDelay.isFinite { minDelay = 0.1 }
+        return PetAnimation(
+            frames: frames,
+            frameEnd: frameEnd,
+            totalDuration: elapsed,
+            minFrameDelay: max(minDelay, 0.02)
+        )
+    }
+
+    /// GIF per-frame delay in seconds, clamped to a sane floor.
+    private static func frameDelay(_ source: CGImageSource, _ index: Int) -> Double {
+        let props = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
+        let gif = props?[kCGImagePropertyGIFDictionary] as? [CFString: Any]
+        let unclamped = gif?[kCGImagePropertyGIFUnclampedDelayTime] as? Double
+        let clamped = gif?[kCGImagePropertyGIFDelayTime] as? Double
+        let delay = unclamped ?? clamped ?? 0.1
+        return delay < 0.011 ? 0.1 : delay
     }
 }
 
@@ -64,24 +119,22 @@ struct PetIllustration: View {
     /// True when the pet is travelling right-to-left across the screen.
     var facingLeft: Bool = false
 
-    private static let framesPerSecond = 10.0
-
     var body: some View {
-        let frames = SpriteCache.frames(for: kind)
+        let animation = PetAnimationCache.animation(for: kind)
         // Flip so the pet faces its direction of travel.
         let flipped = facingLeft != kind.artFacesLeft
+        let interval = max(animation.minFrameDelay, 1.0 / 60.0)
 
-        TimelineView(.animation(minimumInterval: 1.0 / Self.framesPerSecond, paused: isCallingAttention)) { timeline in
+        TimelineView(.animation(minimumInterval: interval, paused: isCallingAttention)) { timeline in
             let index: Int = {
-                guard !frames.isEmpty else { return 0 }
+                guard !animation.frames.isEmpty else { return 0 }
                 if isCallingAttention { return 0 } // settle on a neutral pose while centred
-                let tick = Int(timeline.date.timeIntervalSinceReferenceDate * Self.framesPerSecond)
-                return tick % frames.count
+                return animation.frameIndex(atElapsed: timeline.date.timeIntervalSinceReferenceDate)
             }()
 
             Group {
-                if frames.indices.contains(index) {
-                    Image(decorative: frames[index], scale: 1, orientation: .up)
+                if animation.frames.indices.contains(index) {
+                    Image(decorative: animation.frames[index], scale: 1, orientation: .up)
                         .resizable()
                         .interpolation(.high)
                         .aspectRatio(contentMode: .fit)
@@ -91,7 +144,7 @@ struct PetIllustration: View {
             }
             .scaleEffect(x: flipped ? -1 : 1, y: 1)
         }
-        .frame(width: 104, height: 96)
+        .frame(width: 152 * kind.sizeScale, height: 140 * kind.sizeScale)
         .offset(y: isCallingAttention ? -4 : 0)
         .animation(.spring(response: 0.34, dampingFraction: 0.55), value: isCallingAttention)
         .accessibilityLabel("Pet")
@@ -100,8 +153,9 @@ struct PetIllustration: View {
 
 #Preview {
     HStack(spacing: 8) {
-        PetIllustration(kind: .bernese)
-        PetIllustration(kind: .bernese, facingLeft: true)
+        PetIllustration(kind: .redPanda)
+        PetIllustration(kind: .penguin, facingLeft: true)
+        PetIllustration(kind: .catDonut)
     }
     .padding()
     .background(Color(white: 0.15))

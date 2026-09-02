@@ -3,7 +3,7 @@ import SwiftUI
 
 @MainActor
 final class ReminderPanelController {
-    private let panelSize = CGSize(width: 460, height: 190)
+    private let panelSize = CGSize(width: 540, height: 230)
     private var panel: NSPanel?
     private var presentationState: ReminderPresentationState?
     private var presentationID = UUID()
@@ -129,7 +129,7 @@ final class ReminderPresentationState: ObservableObject {
     let facingLeft: Bool
     @Published var isCallingAttention = false
 
-    init(reminders: [ReminderCandidate], pet: PetKind = .bernese, facingLeft: Bool = false) {
+    init(reminders: [ReminderCandidate], pet: PetKind = .frog, facingLeft: Bool = false) {
         self.reminders = reminders
         self.pet = pet
         self.facingLeft = facingLeft

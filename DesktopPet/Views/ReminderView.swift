@@ -21,7 +21,7 @@ struct ReminderView: View {
             reminderBubble
         }
         .padding(18)
-        .frame(width: 460, height: 190, alignment: .bottom)
+        .frame(width: 540, height: 230, alignment: .bottom)
     }
 
     private var reminderBubble: some View {
