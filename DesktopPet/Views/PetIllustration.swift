@@ -25,12 +25,25 @@ enum PetKind: String, CaseIterable, Sendable {
         }
     }
 
-    /// Per-pet tweak to the on-screen size so tall or small artwork
-    /// doesn't read as tiny next to the wider walkers.
-    var sizeScale: CGFloat {
+    /// The box the drawn character actually fills inside its GIF canvas,
+    /// as fractions of the canvas: `size` is width/height, `center` is the
+    /// character's midpoint. Measured from the union of every frame so the
+    /// walk cycle stays put. Lets the view render each character at a
+    /// matching on-screen size and seat it on the baseline regardless of
+    /// how much empty margin the source GIF carries.
+    var contentBox: (size: CGSize, center: CGPoint) {
         switch self {
-        case .chick: return 1.2
-        default: return 1
+        case .frog:  return (CGSize(width: 0.732, height: 0.576), CGPoint(x: 0.508, y: 0.512))
+        case .chick: return (CGSize(width: 0.401, height: 0.431), CGPoint(x: 0.481, y: 0.507))
+        }
+    }
+
+    /// Extra downward shift (points) to line the character up with the
+    /// reminder bubble.
+    var baselineNudge: CGFloat {
+        switch self {
+        case .chick: return 12
+        case .frog: return 0
         }
     }
 }
@@ -42,6 +55,8 @@ private struct PetAnimation {
     var frameEnd: [Double]
     var totalDuration: Double
     var minFrameDelay: Double
+    /// Pixel width / height of a frame.
+    var pixelAspect: CGFloat
 
     func frameIndex(atElapsed elapsed: Double) -> Int {
         guard totalDuration > 0, !frames.isEmpty else { return 0 }
@@ -67,7 +82,9 @@ private enum PetAnimationCache {
             let url = Bundle.main.url(forResource: name, withExtension: "gif"),
             let source = CGImageSourceCreateWithURL(url as CFURL, nil)
         else {
-            return PetAnimation(frames: [], frameEnd: [], totalDuration: 0, minFrameDelay: 0.1)
+            return PetAnimation(
+                frames: [], frameEnd: [], totalDuration: 0, minFrameDelay: 0.1, pixelAspect: 1
+            )
         }
 
         let count = CGImageSourceGetCount(source)
@@ -86,11 +103,13 @@ private enum PetAnimationCache {
         }
 
         if !minDelay.isFinite { minDelay = 0.1 }
+        let aspect = frames.first.map { CGFloat($0.width) / CGFloat($0.height) } ?? 1
         return PetAnimation(
             frames: frames,
             frameEnd: frameEnd,
             totalDuration: elapsed,
-            minFrameDelay: max(minDelay, 0.02)
+            minFrameDelay: max(minDelay, 0.02),
+            pixelAspect: aspect
         )
     }
 
@@ -111,11 +130,29 @@ struct PetIllustration: View {
     /// True when the pet is travelling right-to-left across the screen.
     var facingLeft: Bool = false
 
+    /// On-screen height of the drawn character — the same for every pet so
+    /// they read as one size no matter their source canvas.
+    private static let characterHeight: CGFloat = 148
+    /// Fixed layout width so the reminder bubble doesn't shift between pets.
+    private static let layoutWidth: CGFloat = 208
+
     var body: some View {
         let animation = PetAnimationCache.animation(for: kind)
         // Flip so the pet faces its direction of travel.
         let flipped = facingLeft != kind.artFacesLeft
         let interval = max(animation.minFrameDelay, 1.0 / 60.0)
+
+        // Blow the frame up so the character (not the whole canvas) is
+        // `characterHeight` tall, then slide the character to the middle and
+        // clip away the surplus transparent margin.
+        let content = kind.contentBox
+        let renderHeight = Self.characterHeight / content.size.height
+        let renderWidth = renderHeight * animation.pixelAspect
+        let characterAspect = animation.pixelAspect * (content.size.width / content.size.height)
+        let clipWidth = Self.characterHeight * characterAspect + 4
+        let clipHeight = Self.characterHeight + 4
+        let shiftX = (0.5 - content.center.x) * renderWidth * (flipped ? -1 : 1)
+        let shiftY = (0.5 - content.center.y) * renderHeight
 
         TimelineView(.animation(minimumInterval: interval, paused: isCallingAttention)) { timeline in
             let index: Int = {
@@ -129,15 +166,19 @@ struct PetIllustration: View {
                     Image(decorative: animation.frames[index], scale: 1, orientation: .up)
                         .resizable()
                         .interpolation(.high)
-                        .aspectRatio(contentMode: .fit)
                 } else {
                     Color.clear
                 }
             }
+            .frame(width: renderWidth, height: renderHeight)
             .scaleEffect(x: flipped ? -1 : 1, y: 1)
+            .offset(x: shiftX, y: shiftY)
         }
-        .frame(width: 152 * kind.sizeScale, height: 140 * kind.sizeScale)
-        .offset(y: isCallingAttention ? -4 : 0)
+        .frame(width: clipWidth, height: clipHeight)
+        .clipped()
+        .frame(width: Self.layoutWidth, height: Self.characterHeight, alignment: .bottom)
+        .offset(y: (isCallingAttention ? -4 : 0) + kind.baselineNudge)
+        .allowsHitTesting(false)
         .animation(.spring(response: 0.34, dampingFraction: 0.55), value: isCallingAttention)
         .accessibilityLabel("Pet")
     }
