@@ -97,6 +97,6 @@ The app is organized into a few focused components:
 
 Scheduler behavior is covered by `DesktopPetTests/ReminderSchedulerTests.swift`.
 
-## Current scope
+## Project status
 
-This repository contains the working first version and is still under active development. It does not yet provide a signed installer or App Store release. Manual timers, travel-time calculations, meeting-link detection, sound, and exact-start notifications are outside the current scope.
+The source implementation is complete for the feature set documented above. This repository is distributed as an Xcode project rather than a signed installer or App Store release. Manual timers, travel-time calculations, meeting-link detection, sound, and exact-start notifications are intentionally outside its scope.
