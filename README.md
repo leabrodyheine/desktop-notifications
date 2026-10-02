@@ -4,11 +4,9 @@ Desktop Pet is a native macOS menu-bar app that turns upcoming Apple Calendar ev
 
 ## Demo
 
-<video src="docs/demo/desktop-pet-preview.mov" controls width="960">
-  <a href="docs/demo/desktop-pet-preview.mov">Watch the Desktop Pet reminder demo</a>
-</video>
+![Desktop Pet reminder demo](docs/demo/desktop-pet-preview.gif)
 
-[Download or watch the Desktop Pet reminder demo](docs/demo/desktop-pet-preview.mov)
+[Watch or download the full-quality video](docs/demo/desktop-pet-preview.mov)
 
 The demo uses the built-in **Preview reminder** action. Calendar details in the recording are blurred for privacy.
 
