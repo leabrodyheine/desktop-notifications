@@ -180,7 +180,7 @@ struct PetIllustration: View {
         .offset(y: (isCallingAttention ? -4 : 0) + kind.baselineNudge)
         .allowsHitTesting(false)
         .animation(.spring(response: 0.34, dampingFraction: 0.55), value: isCallingAttention)
-        .accessibilityLabel("Pet")
+        .accessibilityHidden(true)
     }
 }
 
