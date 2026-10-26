@@ -46,6 +46,7 @@ struct ReminderView: View {
                 .frame(maxWidth: .infinity, minHeight: 116, alignment: .leading)
             }
             .buttonStyle(.plain)
+            .accessibilityHint("Opens the event in Calendar")
 
             if isHovering {
                 Button(action: onDismiss) {
