@@ -135,8 +135,7 @@ final class AppModel: ObservableObject {
         let event = CalendarEvent(
             id: "preview",
             title: "Design review",
-            startDate: Date().addingTimeInterval(30 * 60),
-            calendarItemIdentifier: "preview"
+            startDate: Date().addingTimeInterval(30 * 60)
         )
         presenter.present(
             reminders: [ReminderCandidate(event: event, minutesBefore: 30)],

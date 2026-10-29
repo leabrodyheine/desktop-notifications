@@ -50,8 +50,7 @@ final class CalendarService: ObservableObject {
                 CalendarEvent(
                     id: event.eventIdentifier ?? event.calendarItemIdentifier,
                     title: normalizedTitle(event.title),
-                    startDate: event.startDate,
-                    calendarItemIdentifier: event.calendarItemIdentifier
+                    startDate: event.startDate
                 )
             }
             .sorted { $0.startDate < $1.startDate }

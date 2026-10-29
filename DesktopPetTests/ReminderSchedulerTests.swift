@@ -7,8 +7,7 @@ final class ReminderSchedulerTests: XCTestCase {
         let event = CalendarEvent(
             id: "event-1",
             title: "Planning",
-            startDate: start,
-            calendarItemIdentifier: "calendar-item-1"
+            startDate: start
         )
 
         let candidates = ReminderScheduler.candidates(
@@ -26,8 +25,7 @@ final class ReminderSchedulerTests: XCTestCase {
         let event = CalendarEvent(
             id: "event-1",
             title: "Planning",
-            startDate: Date(timeIntervalSinceReferenceDate: 10_000),
-            calendarItemIdentifier: "calendar-item-1"
+            startDate: Date(timeIntervalSinceReferenceDate: 10_000)
         )
 
         let candidates = ReminderScheduler.candidates(
@@ -43,8 +41,7 @@ final class ReminderSchedulerTests: XCTestCase {
         let event = CalendarEvent(
             id: "event-1",
             title: "Planning",
-            startDate: start,
-            calendarItemIdentifier: "calendar-item-1"
+            startDate: start
         )
 
         let first = ReminderCandidate(event: event, minutesBefore: 30)
